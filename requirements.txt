@@ -1,0 +1,6 @@
+ccxt
+pandas
+APScheduler==3.7.0
+gspread
+oauth2client
+gspread_dataframe
