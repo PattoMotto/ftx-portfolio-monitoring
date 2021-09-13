@@ -3,8 +3,11 @@ import gsheetHelper as gsheet
 from exchangeClient import ExchangeClient
 import ccxt
 import time, os, sys
+from datetime import datetime
 
 clearConsole = lambda: os.system('cls' if os.name in ('nt', 'dos') else 'clear')
+summarySheetName = 'summary'
+historySheetName = 'history'
 
 class PortfolioMonitoringBot:
     def __init__(self, apiKey, secret, gSheetName):
@@ -36,22 +39,29 @@ class PortfolioMonitoringBot:
                 wallets[subaccount] = self.getWalletData(exchangeClient)
                 time.sleep(0.1)
             toBeRemoved = []
-            for key in wallets.keys():
-                if len(wallets[key]) == 0:
-                    toBeRemoved.append(key)
-            for key in toBeRemoved:
-                del wallets[key]
+            for subaccount in wallets.keys():
+                if len(wallets[subaccount]) == 0:
+                    toBeRemoved.append(subaccount)
+            for subaccount in toBeRemoved:
+                del wallets[subaccount]
             summary = []
-            for key in wallets.keys():
-                coins = wallets[key]
+            history = {}
+            for subaccount in wallets.keys():
+                walletTotalUSD = 0
+                coins = wallets[subaccount]
                 dataframe = pd.DataFrame(coins)
                 print(dataframe)
-                self.writeRecord(key, dataframe)
+                self.writeRecord(subaccount, dataframe)
                 for index in range(0, len(coins)):
-                    coins[index]['subaccount'] = key
+                    coins[index]['subaccount'] = subaccount
+                    walletTotalUSD += float(coins[index]['usdValue'])
                 summary += coins
+                history[subaccount] = walletTotalUSD
                 time.sleep(0.1)
-            self.writeRecord('summary', pd.DataFrame(summary))
+            now = datetime.now()
+            history['time'] = now.isoformat()
+            self.writeRecord(summarySheetName, pd.DataFrame(summary))
+            self.addHistory(historySheetName, history)
             clearConsole()
         except Exception as e:
             exc_type, exc_tb = sys.exc_info()
@@ -74,6 +84,15 @@ class PortfolioMonitoringBot:
             exchange.headers = { 'FTX-SUBACCOUNT': subaccount }
 
         return ExchangeClient(exchange)
+
+    def addHistory(self, worksheetName, history):
+        dataframe = gsheet.readWorksheet(fileName=self.gSheetName, worksheetName=worksheetName)
+        if dataframe.empty:
+            dataframe = pd.DataFrame([history])
+        else:
+            dataframe = gsheet.setFirstRowAsColumn(dataframe)
+            dataframe = dataframe.append(history, ignore_index=True)
+        gsheet.writeDataFrame(dataframe, fileName=self.gSheetName, worksheetName=worksheetName)
 
     def writeRecord(self, worksheetName, dataframe):
         gsheet.writeDataFrame(dataframe, fileName=self.gSheetName, worksheetName=worksheetName)

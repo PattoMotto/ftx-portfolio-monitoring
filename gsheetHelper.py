@@ -26,8 +26,12 @@ def writeDataFrame(dataFrame, fileName, worksheetName):
     set_with_dataframe(worksheet, dataFrame)
 
 def readWorksheet(fileName, worksheetName):
-    sheet = client.open(fileName)
-    worksheet = sheet.worksheet(worksheetName)
+    spreadsheet = client.open(fileName)
+    for worksheet in spreadsheet.worksheets():
+        if worksheetName == worksheet.title:
+            worksheet = spreadsheet.worksheet(worksheetName)
+            return pd.DataFrame(worksheet.get_all_values())
+    worksheet = spreadsheet.add_worksheet(title=worksheetName, rows=100, cols=10)
     return pd.DataFrame(worksheet.get_all_values())
 
 def clearWorksheet(fileName, worksheetName, range):
