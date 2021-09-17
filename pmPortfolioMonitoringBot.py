@@ -29,6 +29,7 @@ class PortfolioMonitoringBot:
 
     def loop(self):
         try:
+            clearConsole()
             wallets = {'main': self.getWalletData(self.mainExchangeClient)}
             for subaccount in self.subaccounts:
                 exchangeClient = self.getExchangeClient(
@@ -62,7 +63,6 @@ class PortfolioMonitoringBot:
             history['time'] = now.isoformat()
             self.writeRecord(summarySheetName, pd.DataFrame(summary))
             self.addHistory(historySheetName, history)
-            clearConsole()
         except Exception as e:
             exc_type, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
