@@ -38,6 +38,14 @@ def clearWorksheet(fileName, worksheetName, range):
     sheet = client.open(fileName)
     sheet.values_clear('{}!{}'.format(worksheetName, range))
 
+def deleteWorksheet(fileName, worksheetName):
+    spreadsheet = client.open(fileName)
+    for worksheet in spreadsheet.worksheets():
+        if worksheetName == worksheet.title:
+            worksheet = spreadsheet.worksheet(worksheetName)
+            spreadsheet.del_worksheet(worksheet)
+            return
+
 def setFirstRowAsColumn(dataFrame):
     dataFrame.columns = dataFrame.iloc[0]
     dataFrame = dataFrame[1:]

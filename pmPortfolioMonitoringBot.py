@@ -95,4 +95,5 @@ class PortfolioMonitoringBot:
         gsheet.writeDataFrame(dataframe, fileName=self.gSheetName, worksheetName=worksheetName)
 
     def writeRecord(self, worksheetName, dataframe):
+        gsheet.clearWorksheet(fileName=self.gSheetName, worksheetName=worksheetName, range='A:F')
         gsheet.writeDataFrame(dataframe, fileName=self.gSheetName, worksheetName=worksheetName)
