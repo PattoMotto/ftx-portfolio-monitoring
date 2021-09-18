@@ -30,6 +30,7 @@ class PortfolioMonitoringBot:
     def loop(self):
         try:
             clearConsole()
+            print('subaccounts: ', self.subaccounts)
             wallets = {'main': self.getWalletData(self.mainExchangeClient)}
             for subaccount in self.subaccounts:
                 exchangeClient = self.getExchangeClient(
@@ -69,8 +70,12 @@ class PortfolioMonitoringBot:
             print(exc_type, fname, exc_tb.tb_lineno, e)
 
     def getWalletData(self, exchangeClient):
-        wallet = exchangeClient.getWalletBalance()['info']['result']
-        return list(filter(self.nonZeroValue, wallet))
+        data = exchangeClient.getWalletBalance()
+        if 'info' in data and 'result' in data['info']:
+            wallet = exchangeClient.getWalletBalance()['info']['result']
+            return list(filter(self.nonZeroValue, wallet))
+        else:
+            raise Exception('Unrecognized format', data)
 
     def nonZeroValue(self, data):
         return float(data['total']) != 0
