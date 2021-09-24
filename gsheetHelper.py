@@ -35,8 +35,10 @@ def readWorksheet(fileName, worksheetName):
     return pd.DataFrame(worksheet.get_all_values())
 
 def clearWorksheet(fileName, worksheetName, range):
-    sheet = client.open(fileName)
-    sheet.values_clear('{}!{}'.format(worksheetName, range))
+    spreadsheet = client.open(fileName)
+    for worksheet in spreadsheet.worksheets():
+        if worksheetName == worksheet.title:
+            spreadsheet.values_clear('{}!{}'.format(worksheetName, range))
 
 def deleteWorksheet(fileName, worksheetName):
     spreadsheet = client.open(fileName)
