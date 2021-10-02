@@ -27,3 +27,7 @@ pip install -r requirements.txt
 ```
 python start_bot.py
 ```
+
+### Use case 1 visualize on [data studio](https://datastudio.google.com)
+<img width="1204" alt="image" src="https://user-images.githubusercontent.com/1745000/135710488-18d6f3b7-2d67-4a95-9344-226def080ba9.png">
+<img width="1201" alt="image" src="https://user-images.githubusercontent.com/1745000/135710553-94206175-f48c-4ab7-91fa-fc484f273851.png">
